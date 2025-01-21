@@ -1,0 +1,41 @@
+name: 'Publish Dotnet Nuget to JFrog Artifactory'
+description: 'A GitHub Action to publish .NET packages to JFrog Artifactory'
+author: 'George Ekow-Daniels'
+branding:
+  icon: 'package'
+  color: 'blue'
+
+inputs:
+  version:
+    description: 'Version tag'
+    required: true
+  file_publish_path:
+    description: 'Relative path to the packages'
+    default: "**/*.nupkg"
+    required: true
+  target:
+    description: 'Target path in Artifactory'
+    required: true
+  skip_duplicate:
+    description: 'Skip duplicate packages'
+    required: false
+    default: true
+
+secrets:
+  artifactory_url:
+    description: 'Artifactory URL'
+    required: true
+  api_key:
+    description: 'Artifactory API key'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Publish Dotnet to JFrog Artifactory
+      env:
+        FILE_PUBLISHED_PATH: ${{ inputs.file_publish_path }}
+        TARGET: ${{ inputs.target }}
+        SKIP_DUPLICATE: ${{ inputs.skip_duplicate }}
+      run: |
+        dotnet nuget push **/*${{ env.FILE_PUBLISHED_PATH }}.nupkg --source "${{ secrets.artifactory_url }}/api/nuget/v3/${{ env.TARGET }}" --api-key "${{ secrets.api_key }}" ${{ env.SKIP_DUPLICATE && '--skip-duplicate' || '' }}
