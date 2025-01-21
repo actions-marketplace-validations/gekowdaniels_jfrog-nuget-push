@@ -6,13 +6,10 @@ branding:
   color: 'blue'
 
 inputs:
-  version:
-    description: 'Version tag'
-    required: true
   file_publish_path:
     description: 'Relative path to the packages'
     default: "**/*.nupkg"
-    required: true
+    required: false
   target:
     description: 'Target path in Artifactory'
     required: true
@@ -38,4 +35,4 @@ runs:
         TARGET: ${{ inputs.target }}
         SKIP_DUPLICATE: ${{ inputs.skip_duplicate }}
       run: |
-        dotnet nuget push **/*${{ env.FILE_PUBLISHED_PATH }}.nupkg --source "${{ secrets.artifactory_url }}/api/nuget/v3/${{ env.TARGET }}" --api-key "${{ secrets.api_key }}" ${{ env.SKIP_DUPLICATE && '--skip-duplicate' || '' }}
+        dotnet nuget push {{ env.FILE_PUBLISHED_PATH }} --source "${{ secrets.artifactory_url }}/api/nuget/v3/${{ env.TARGET }}" --api-key "${{ secrets.api_key }}" ${{ env.SKIP_DUPLICATE && '--skip-duplicate' || '' }}
